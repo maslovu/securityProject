@@ -1,0 +1,20 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: books-maslov
+          predicates:
+            - Path=/api/books/**
+          uri: http://localhost:30080
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8090/realms/maslov-realm
+          jwk-set-uri: http://localhost:8090/realms/maslov-realm/protocol/openid-connect/certs
