@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak-deployment
+  namespace: default
+  labels:
+    app: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: quay.io/keycloak/keycloak:latest
+          args: ["start-dev", "--bootstrap-admin-username=admin", "--bootstrap-admin-password=admin"] # Режим разработки (без принудительного HTTPS)
+          ports:
+            - containerPort: 8080 # Внутри контейнера Keycloak слушает 8080
+              name: http
+          env:
+            # Эти креды сработают ТОЛЬКО если вы вручную удалите PVC диск.
+            # Если диск уже существует, Keycloak их просто проигнорирует.
+            - name: KEYCLOAK_ADMIN
+              value: "admin"
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: "admin"
+
+          # Подключаем папку внутри контейнера к постоянному диску
+          volumeMounts:
+            - name: keycloak-db-data
+              mountPath: /opt/keycloak/data/h2 # Путь, где Keycloak на Quarkus хранит встроенную БД
+
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "1024Mi" # Keycloak требователен к памяти
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+
+      # Объявляем виртуальный диск
+      volumes:
+      - name: keycloak-db-data
+        persistentVolumeClaim:
+          claimName: keycloak-pvc # Ссылка на описание диска ниже
+
+---
+# Блок постоянного диска
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: keycloak-pvc
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi # 1 Гб для встроенной БД Keycloak
+
+---
+# Блок сетевого сервиса
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak-service # 👈 Это имя строго совпадает с тем, что ищет шлюз!
+  namespace: default
+spec:
+  selector:
+    app: keycloak
+  ports:
+    - protocol: TCP
+      port: 8080       # Порт внутри кластера K8s для связи со шлюзом
+      targetPort: 8080
+      nodePort: 30090  # Порт на вашем компьютере (localhost:30090) для входа в админку
+  type: NodePort       # Открываем доступ наружу для настройки через браузер
