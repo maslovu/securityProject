@@ -10,7 +10,7 @@ spring:
         - id: books-maslov
           predicates:
             - Path=/api/books/**
-          uri: http://localhost:30080
+          uri: ${BOOKS_SERVICE_URL:http://localhost:30080}
 
   security:
     oauth2:
