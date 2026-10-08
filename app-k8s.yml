@@ -69,6 +69,6 @@ spec:
     app: api-gateway
   ports:
     - protocol: TCP
-      port: 8089       # Этот порт откроется на вашем localhost компьютера
+      port: 8089       # Этот порт откроется на localhost компьютера
       targetPort: 8082 # На этот порт сервис перенаправит трафик внутри пода
   type: LoadBalancer   # 🌟 Магия Docker Desktop: делает шлюз доступным снаружи
