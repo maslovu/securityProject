@@ -13,7 +13,7 @@ public class SecurityController {
     @GetMapping
     public Mono<String> hello(Authentication auth) {
         // Здесь можно залогировать имя пользователя:
-        //auth.getName() -> user's sub from Keycloak
+        // auth.getName() -> user's sub from Keycloak
         return Mono.just("Hello, " + auth.getName());
     }
 }
