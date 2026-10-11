@@ -31,7 +31,6 @@ public class KeycloakReactiveJwtAuthenticationConverter implements Converter<Jwt
         // 2. Извлекаем стандартные scope (например, SCOPE_read), метод гарантированно возвращает Collection<GrantedAuthority>
         allAuthorities.addAll(defaultAuthoritiesConverter.convert(jwt));
 
-
         // 3. Добавляем роли из Keycloak
         allAuthorities.addAll(extractKeycloakRoles(jwt));
 

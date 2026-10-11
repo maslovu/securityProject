@@ -61,7 +61,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi # 1 Гб для встроенной БД Keycloak
+      storage: 1Gi0 # 1 Гб для встроенной БД Keycloak
 
 ---
 # Блок сетевого сервиса
@@ -75,7 +75,7 @@ spec:
     app: keycloak
   ports:
     - protocol: TCP
-      port: 8080       # Порт внутри кластера K8s для связи со шлюзом
+      port: 8080 # Порт внутри кластера K8s для связи со шлюзом
       targetPort: 8080
-      nodePort: 30090  # Порт на вашем компьютере (localhost:30090) для входа в админку
-  type: NodePort       # Открываем доступ наружу для настройки через браузер
+      nodePort: 30090 # Порт на вашем компьютере (localhost:30090) для входа в админку
+  type: NodePort # Открываем доступ наружу для настройки через браузер
