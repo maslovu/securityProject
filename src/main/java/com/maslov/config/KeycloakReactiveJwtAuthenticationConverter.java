@@ -31,7 +31,6 @@ public class KeycloakReactiveJwtAuthenticationConverter implements Converter<Jwt
         // 2. Извлекаем стандартные scope (например, SCOPE_read), метод гарантированно возвращает Collection<GrantedAuthority>
         allAuthorities.addAll(defaultAuthoritiesConverter.convert(jwt));
 
-
         // 3. Добавляем роли из Keycloak
         allAuthorities.addAll(extractKeycloakRoles(jwt));
 
@@ -42,7 +41,7 @@ public class KeycloakReactiveJwtAuthenticationConverter implements Converter<Jwt
 
     @SuppressWarnings("unchecked")
     private Collection<GrantedAuthority> extractKeycloakRoles(Jwt jwt) {
-        Map<String, Object> realmAccess = jwt.getClaim("realm_access");
+        Map<String, Object> realmAccess = jwt.getClaimAsMap("realm_access");
         if (realmAccess == null || !realmAccess.containsKey("roles")) {
             return Collections.emptyList();
         }

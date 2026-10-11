@@ -17,9 +17,8 @@ spec:
     spec:
       containers:
         - name: api-gateway-container
-          # Название вашего локального Docker-образа
-          image: com.maslov/security-project-gateway:latest
-          imagePullPolicy: Never # 👈 Важно для Docker Desktop: берет образ из локального кэша Docker, а не из интернета
+          image: com.maslov/security-project-gateway:latest # Название локального Docker-образа
+          imagePullPolicy: Never # Важно для Docker Desktop: берет образ из локального кэша Docker, а не из интернета
 
           ports:
             - containerPort: 8082
@@ -49,7 +48,7 @@ spec:
             httpGet:
               path: /actuator/health/liveness
               port: 8082
-            initialDelaySeconds: 20 # Уменьшил время для быстрой локальной отладки
+            initialDelaySeconds: 20 # Время для быстрой локальной отладки
             periodSeconds: 10
           readinessProbe:
             httpGet:
@@ -71,4 +70,4 @@ spec:
     - protocol: TCP
       port: 8089       # Этот порт откроется на localhost компьютера
       targetPort: 8082 # На этот порт сервис перенаправит трафик внутри пода
-  type: LoadBalancer   # 🌟 Магия Docker Desktop: делает шлюз доступным снаружи
+  type: LoadBalancer   # Docker Desktop делает шлюз доступным снаружи

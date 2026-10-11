@@ -22,7 +22,7 @@ public class SecurityConfig {
                 // Отключаем сессию, так как мы stateless
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
 
-                // Главная магия: говорим шлюзу, что он является OAuth2 Resource Server
+                // говорим шлюзу, что он является OAuth2 Resource Server
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt ->
                                 jwt.jwtAuthenticationConverter(new KeycloakReactiveJwtAuthenticationConverter())))
