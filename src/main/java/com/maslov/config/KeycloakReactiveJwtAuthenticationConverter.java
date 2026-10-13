@@ -11,30 +11,28 @@ import reactor.core.publisher.Mono;
 import reactor.util.annotation.NonNull;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class KeycloakReactiveJwtAuthenticationConverter implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
 
-    // Синхронный конвертер стандартных scope (SCOPE_xxx)
+    // Synchronous converter for standard scopes (SCOPE_xxx)
     private final JwtGrantedAuthoritiesConverter defaultAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
 
     @Override
     public Mono<AbstractAuthenticationToken> convert(@NonNull Jwt jwt) {
-        // 1. Создаем изменяемый Set для всех прав
+        // 1. Create a mutable Set for all rights
         Set<GrantedAuthority> allAuthorities = new HashSet<>();
 
-        // 2. Извлекаем стандартные scope (например, SCOPE_read), метод гарантированно возвращает Collection<GrantedAuthority>
+        // 2. Extracts standard scopes (e.g., SCOPE_read); the method is guaranteed to return a Collection<GrantedAuthority>
         allAuthorities.addAll(defaultAuthoritiesConverter.convert(jwt));
 
-        // 3. Добавляем роли из Keycloak
+        // 3. Adding roles from Keycloak
         allAuthorities.addAll(extractKeycloakRoles(jwt));
 
-        // 4. Оборачиваем готовый токен в реактивный Mono.just
+        // 4. Wrap the resulting token in a reactive `Mono.just`
         String principalClaimName = jwt.getClaimAsString("preferred_username");
         if (principalClaimName == null) {
             principalClaimName = jwt.getSubject();
