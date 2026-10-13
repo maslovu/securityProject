@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class KeycloakReactiveJwtAuthenticationConverter implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
 
-    // Используем блокирующий конвертер напрямую, так как чтение полей из JWT — это синхронная операция в памяти
+    // Синхронный конвертер стандартных scope (SCOPE_xxx)
     private final JwtGrantedAuthoritiesConverter defaultAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
 
     @Override
@@ -36,6 +36,9 @@ public class KeycloakReactiveJwtAuthenticationConverter implements Converter<Jwt
 
         // 4. Оборачиваем готовый токен в реактивный Mono.just
         String principalClaimName = jwt.getClaimAsString("preferred_username");
+        if (principalClaimName == null) {
+            principalClaimName = jwt.getSubject();
+        }
         return Mono.just(new JwtAuthenticationToken(jwt, allAuthorities, principalClaimName));
     }
 
@@ -43,12 +46,12 @@ public class KeycloakReactiveJwtAuthenticationConverter implements Converter<Jwt
     private Collection<GrantedAuthority> extractKeycloakRoles(Jwt jwt) {
         Map<String, Object> realmAccess = jwt.getClaimAsMap("realm_access");
         if (realmAccess == null || !realmAccess.containsKey("roles")) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         List<String> roles = (List<String>) realmAccess.get("roles");
         return roles.stream()
                 .map(roleName -> (GrantedAuthority) new SimpleGrantedAuthority("ROLE_" + roleName)) // Spring требует префикс ROLE_
-                .collect(Collectors.toList());
+                .toList();
     }
 }

@@ -13,16 +13,16 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
-                // Открываем доступ к метрикам без авторизации
+                // Permit all access to metrics
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/actuator/**").permitAll()
-                        // Защищаем все остальные эндпоинты
+                        // Secure all other endpoints
                         .anyExchange().authenticated())
 
-                // Отключаем сессию, так как мы stateless
+                // Disable CSRF — stateless API
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
 
-                // говорим шлюзу, что он является OAuth2 Resource Server
+                // Configure as OAuth2 Resource Server
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt ->
                                 jwt.jwtAuthenticationConverter(new KeycloakReactiveJwtAuthenticationConverter())))

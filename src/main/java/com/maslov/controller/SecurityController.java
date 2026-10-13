@@ -12,8 +12,7 @@ public class SecurityController {
 
     @GetMapping
     public Mono<String> hello(Authentication auth) {
-        // Здесь можно залогировать имя пользователя:
-        // auth.getName() -> user's sub from Keycloak
+        // auth.getName() returns preferred_username from JWT, not user sub
         return Mono.just("Hello, " + auth.getName());
     }
 }
